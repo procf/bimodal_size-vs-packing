@@ -1,0 +1,17 @@
+New initialization file is being created
+Setting particle types
+Setting particle masses
+Setting particle diameters
+Randomly distributing colloid particles
+12795 colloid particles have been placed without overlaps
+Randomly distributing solvent particles
+823200 solvent particles have been placed without colloid-solvent overlaps
+New initialization file (init.gsd) created.
+
+Simulation volume: L_X = 70, L_Y = 70, L_Z = 70
+Volume fraction: 0.2; percent colloid 1: 0.75, percent colloid 2: 0.25
+
+Total number of particles: 835995
+Total number of solvent particles: 823200
+Total number of colloid particles: 12795; N_C1 = 12283; N_C2 = 512
+The simulation ran for 0day(s) 21hr(s) 9min 11sec real (wall clock) time
