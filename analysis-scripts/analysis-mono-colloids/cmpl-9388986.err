@@ -1,0 +1,83 @@
+/projects/props/Rob/software/hoomd4.2.1-mod/hoomdmod4.2.1-venv/lib/python3.10/site-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+  warnings.warn(
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c: In function ‘f2py_setup_void_size_calculation’:
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1881:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1881 |   f2py_void_size_calculation_def[i_f2py++].func = framechoice;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1882:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1882 |   f2py_void_size_calculation_def[i_f2py++].func = rxi;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1883:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1883 |   f2py_void_size_calculation_def[i_f2py++].func = ryi;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1884:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1884 |   f2py_void_size_calculation_def[i_f2py++].func = rzi;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1885:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1885 |   f2py_void_size_calculation_def[i_f2py++].func = box_length;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1886:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1886 |   f2py_void_size_calculation_def[i_f2py++].func = radii;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1890:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1890 |   f2py_void_size_calculation_def[i_f2py++].func = rpos;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1895:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1895 |   f2py_void_size_calculation_def[i_f2py++].func = head;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1896:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1896 |   f2py_void_size_calculation_def[i_f2py++].func = list;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmodmodule.c:1897:49: warning: assignment to ‘f2py_init_func’ {aka ‘void (*)(int *, long int *, void (*)(char *, long int *), int *)’} from incompatible pointer type ‘void (*)(int *, int *, void (*)(char *, int *), int *)’ [-Wincompatible-pointer-types]
+ 1897 |   f2py_void_size_calculation_def[i_f2py++].func = colloid_id;
+      |                                                 ^
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘box_length’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘colloid_id’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘framechoice’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘head’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘list’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘radii’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘rpos’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘rxi’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘ryi’ which has been explicitly imported at (1) [-Wunused-variable]
+/tmp/tmpbuq9vb1a/src.linux-x86_64-3.10/fortranmod-f2pywrappers2.f90:317:10:
+
+  317 |       use void_size_calculation, only : ncolloid
+      |          1
+Warning: Unused module variable ‘rzi’ which has been explicitly imported at (1) [-Wunused-variable]
