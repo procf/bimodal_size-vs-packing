@@ -6,9 +6,9 @@ Simulations can be run using the [sim-scripts](./sim-scripts) and the DPDMorse e
 To confirm that a system is at equilibrium before gelation, use [analysis-eq](./analysis-scripts/analysis-eq)
 
 ## What to expect
-For systems of ~10,000 colloidal particles, use [analysis-scripts](./analysis-scripts) to calculate:
+For systems of ~10,000 colloidal particles the following scripts are available:
 
-[analysis-mono-colloids](./analysis-scripts/analysis-mono-colloids) and [analysis-bi-colloids](./analysis-bi-colloids):
+[analysis-mono-colloids](./analysis-scripts/analysis-mono-colloids) and [analysis-bi-colloids](.analysis-scripts/analysis-bi-colloids):
 - Coordination number distribution and average coordination number
 - Mean squared displacement (MSD)
 - Void size distribution and average void size
