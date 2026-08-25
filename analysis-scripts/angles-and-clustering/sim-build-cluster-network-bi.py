@@ -51,9 +51,7 @@
 ##        saved to data_outpath+'/lcc-cluster-network_G_clusters.pkl'
 ##    - cluster_cauchyborn_df
 ##        # keys : 'average_xi', 'system_volume', 'phi_C_particles', 'phi_C_hull_sum', 
-##                   'phi_C_spheres', 'z_c_old', 'z_c', 'z_c_weighted', 'avg_h', 'avg_h_sq', 
-##                   'var_h', 'k_equip_h0', 'k_equip_varh', 'mean_rik', 'mean_rik_sq', 
-##                   'var_rik', 'k_bend_rik0', 'k_bend_var'
+##                   'phi_C_spheres', 'z_c_old', 'z_c', 'z_c_weighted', 
 ##        saved to data_outpath+'/cluster_cauchy_born_full.csv'
 ##    - iso_df -- FILTERED for clusters with z>= 2.4
 ##        # keys : "average_xi", "phi_C_spheres", 
@@ -1302,8 +1300,6 @@ plt.ylabel('$P(D_c)$',fontsize=15)
 plt.title('Cluster Size Distribution',fontsize=15)
 plt.savefig(f'{data_outpath}/cluster_sizedist_{clustering_style}.pdf', format='pdf', dpi=300, bbox_inches='tight')
 
-#diams = cluster_diameters_df['Diameter']
-#diams = cluster_diameters_df['Physical Diameter']
 diams = np.array(list(physical_cluster_diameters.values()))
 average_xi = sum(diams) / len(diams)
 #print(' - xi:',average_xi) # 'R_C (if simulation data)', '$\mu m$ (if experimental data)')
@@ -1336,14 +1332,7 @@ phi_C_spheres = np.sum(volumes) / system_volume
 
 
 # cluster average coordination number
-nedges_clusters = nx.number_of_edges(G_clusters) # calculate the number of edges
 n_clusters = G_clusters.number_of_nodes()
-if n_clusters > 0:
-  avg_degree_clusters = len(weighted_cluster_edges_df.loc[weighted_cluster_edges_df['weight'] != 0]) / n_clusters
-else:
-  avg_degree_clusters = len(weighted_cluster_edges_df.loc[weighted_cluster_edges_df['weight'] != 0])
-z_c = avg_degree_clusters
-
 if n_clusters > 0:
     total_edges = G_clusters.number_of_edges()   # if graph is simple, E
     avg_degree_unweighted = 2.0 * total_edges / n_clusters
@@ -1358,6 +1347,13 @@ else:
 #print(' - z_c (unweighted avg degree):', avg_degree_unweighted)
 #print(' - z_c (weighted avg degree):', avg_degree_weighted)
 
+# calculate average cluster-bridge bond stiffness
+series = cluster_bridge_df['bond_type'].value_counts(normalize=True)
+weights = {'S-S': 1, 'S-L': 1.5, 'L-L': 2}
+stiffness = sum(weights[bond_type] * frac for bond_type, frac in series.items())
+
+G_prime = stiffness * ((z_c_weighted*phi_C_spheres)/average_xi)
+
 # compile outputs
 data={
       'average_xi'             :[average_xi],
@@ -1365,157 +1361,18 @@ data={
       'phi_C_particles'        :[phi_C_particles],
       'phi_C_hull_sum'         :[phi_C_hull_sum],
       'phi_C_spheres'          :[phi_C_spheres],
-      'z_c_old'                :[z_c],
       'z_c'                    :[avg_degree_unweighted],
       'z_c_weighted'           :[avg_degree_weighted],
+      'kappa'                  :[stiffness]
+      'G_prime'                :[G_prime]
       }
 
 cluster_cauchyborn_df = pd.DataFrame(data)
 
-# STEP 1: ESTIMATE CALLADINE RELATION
-def compute_calladine_F_over_N(z_mean, d=3, r=None, c=None, extra_constraints_per_particle=0.0,
-                              N_triv=0, N_particles=None):
-    """
-    Compute generalized (F - S)/N ~ (d + r) - (z_mean * c)/2 - extra_constraints_per_particle - N_triv/N.
-    """
-    if r is None:
-        r = d * (d - 1) // 2
-    if c is None:
-        c = 1
-    base = (d + r) - 0.5 * z_mean * c - extra_constraints_per_particle
-    if (N_particles is not None) and (N_particles > 0):
-        base -= float(N_triv) / float(N_particles)
-    return base
-
-
-clusters = cluster_diameters_df['Cluster']
-inner_data_dfs = []
-for c in range(len(clusters)):
-    cluster = clusters[c]
-    avg_degree = cluster_diameters_df.loc[cluster_diameters_df['Cluster'] == cluster]['Inner_Avg_Degree'].values
-
-    angle_df = cluster_angle_dfs[c]
-    n_angles = len(angle_df)
-
-    m = n_angles / cluster_diameters_df.loc[cluster_diameters_df['Cluster'] == cluster]['N_particles'].values[0]
-
-    # 3D real-space system
-    N_triv_free = 6
-    #periodic system or LARGE system
-    N_triv_free = 0
-
-    F_over_N_frictionless = compute_calladine_F_over_N(
-          avg_degree, d=3, r=0, c=1, extra_constraints_per_particle=0,
-          N_triv=N_triv_free, N_particles=ncolloids
-    )
-    F_over_N_frictional = compute_calladine_F_over_N(
-          avg_degree, d=3, r=3, c=3, extra_constraints_per_particle=0,
-          N_triv=N_triv_free, N_particles=ncolloids
-    )
-
-    # angle constraints
-    F_over_N_bending = compute_calladine_F_over_N(
-          avg_degree, d=3, r=0, c=1, extra_constraints_per_particle=m,
-          N_triv=N_triv_free, N_particles=ncolloids
-    )
-
-    df = pd.DataFrame([n_angles], columns=['n_angles'])
-    df['m'] = m
-    df['MC_frictionless'] = F_over_N_frictionless
-    df['MC_frictional'] = F_over_N_frictional
-    df['MC_bending'] = F_over_N_bending
-    df['z_iso'] = 6-2*m
-    inner_data_dfs.append(df)
-
-    #print(f" - Cluster {cluster}: <z>={avg_degree[0]}, n_angles={n_angles}")
-    #print(f"     - (F-S)/N = {F_over_N_frictionless} (frictionless)")
-    #print(f"     - (F-S)/N = {F_over_N_frictional} (frictional)")
-    #print(f"     - (F-S)/N = {F_over_N_bending} (bending)")
-
-cluster_interior_df = pd.concat(inner_data_dfs, ignore_index=True)
-#print(cluster_interior_df)
-cluster_diameters_df = pd.concat([cluster_diameters_df, cluster_interior_df], axis=1)
-cluster_diameters_df.to_csv(f'{data_outpath}/cluster_diameters_{clustering_style}.csv', index=False)
-
-
-###############################################################
-# FILTERED CALCULATIONS — clusters with Inner_Avg_Degree >= 2.4
-###############################################################
-
-# 1. Identify clusters that satisfy the threshold
-threshold = 2.4
-
-# If you have the info in a column of cluster_diameters_df:
-filtered_clusters = cluster_diameters_df.loc[
-    cluster_diameters_df["Inner_Avg_Degree"] >= threshold, "Cluster"
-].unique()
-
-# Safety check
-if len(filtered_clusters) == 0:
-    print("ERROR: No clusters satisfy Inner_Avg_Degree >= 2.4")
-    filtered_stats = {
-        "average_xi": np.nan,
-        "phi_C_spheres": np.nan,
-        "z_c": np.nan,
-        "z_c_weighted": np.nan
-    }
-else:
-    ############################################################
-    # 2. average_xi_filtered
-    ############################################################
-    diams_filtered = np.array([
-        physical_cluster_diameters[cid]
-        for cid in filtered_clusters
-        if cid in physical_cluster_diameters
-    ])
-    average_xi_filtered = diams_filtered.mean()
-
-    ############################################################
-    # 3. phi_C_spheres_filtered (sum volume of selected clusters)
-    ############################################################
-    volumes_filtered = 4.0/3.0 * np.pi * (0.5 * diams_filtered)**3
-    phi_C_spheres_filtered = np.sum(volumes_filtered) / system_volume
-
-    ############################################################
-    # 4. Build subgraph containing only filtered clusters
-    ############################################################
-    G_clusters_filtered = G_clusters.subgraph(filtered_clusters).copy()
-
-    ############################################################
-    # 5. Compute z_c_filtered and z_c_weighted_filtered
-    ############################################################
-    n_filt = G_clusters_filtered.number_of_nodes()
-    if n_filt > 0:
-        E_filt = G_clusters_filtered.number_of_edges()
-
-        # Unweighted mean degree
-        z_c_filtered = 2.0 * E_filt / n_filt
-
-        # Weighted mean degree
-        weighted_deg_filt = dict(G_clusters_filtered.degree(weight='weight'))
-        z_c_weighted_filtered = np.mean(list(weighted_deg_filt.values()))
-    else:
-        z_c_filtered = 0.0
-        z_c_weighted_filtered = 0.0
-
-    ############################################################
-    # 6. Pack results
-    ############################################################
-    filtered_stats = {
-        "average_xi": average_xi_filtered,
-        "phi_C_spheres": phi_C_spheres_filtered,
-        "z_c": z_c_filtered,
-        "z_c_weighted": z_c_weighted_filtered
-    }
-
-# Print or merge with your output table
-#print(filtered_stats)
-iso_df = pd.DataFrame([filtered_stats])
-
-print(f"z_c_unique = {iso_df['z_c'].values[0]}")
-print(f"z_c_weighted = {iso_df['z_c_weighted'].values[0]}")
-print(f"phi_C = {iso_df['phi_C_spheres'].values[0]}")
-print(f"xi = {0.5*iso_df['average_xi'].values[0]}")
+print(f"z_c_unique = {cluster_cauchyborn_df['z_c'].values[0]}")
+print(f"z_c_weighted = {cluster_cauchyborn_df['z_c_weighted'].values[0]}")
+print(f"phi_C = {cluster_cauchyborn_df['phi_C_spheres'].values[0]}")
+print(f"xi = {cluster_cauchyborn_df['average_xi'].values[0]}")
+print(f"G_prime = {cluster_cauchyborn_df['G_prime'].values[0]}")
 
 cluster_cauchyborn_df.to_csv(f'{data_outpath}/cluster_cauchy_born_full_{clustering_style}.csv',index = False)
-iso_df.to_csv(f'{data_outpath}/cluster_cauchy_born_iso-clusters_{clustering_style}.csv', index=False)

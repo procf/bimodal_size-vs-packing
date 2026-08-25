@@ -3,15 +3,25 @@ This is a simulation and analysis pipeline for evaluating the multi-scale struct
 
 Simulations can be run using the [sim-scripts](./sim-scripts) and the DPDMorse extension for HOOMD-blue v4.2.1, available as [hoomd4.2.1-mod](https://github.com/procf/hoomd4.2.1-mod).
 
+To confirm that a system is at equilibrium before gelation, use [analysis-eq](./analysis-scripts/analysis-eq)
+
 ## What to expect
 For systems of ~10,000 colloidal particles, use [analysis-scripts](./analysis-scripts) to calculate:
+
+[analysis-mono-colloids](./analysis-scripts/analysis-mono-colloids) and [analysis-bi-colloids](./analysis-bi-colloids):
 - Coordination number distribution and average coordination number
+- Mean squared displacement (MSD)
 - Void size distribution and average void size
-- Network edgelist, the size of connected components, and the physical network diameter ("span" as a proportion of total box size)
+- Voronoi volume distribution
+- Network edgelist, the size of the largest connected component, and the physical network diameter ("span" as a proportion of total box size)
+
+[angles-and-clustering](./analysis-scripts/angles-and-clustering)
 - Angle distribution within the network
-- Identify tetrahedral structures and classify their aggregates
 - Gaussian Mixture Model (GMM) based mesoscale clustering
 - Cauchy-Born estimate of the total elastic modulus from mesoscale (cluster) structure
+
+[tetrahedra](./analysis-scripts/tetrahedra)
+- Identify tetrahedral structures and classify their aggregates
 
 Note: Standard analyses typically take less than 20min. GMM clustering can take ~9hrs. Cauchy-Born estimate takes <1min.
 
