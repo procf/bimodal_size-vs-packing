@@ -1,4 +1,6 @@
 # Size matters more than packing in bimodal colloidal gel compositions
+Results from this project are [available on arXiV](https://doi.org/10.48550/arXiv.2608.16874) and are currently under review.
+
 This is a simulation and analysis pipeline for evaluating the multi-scale structure of bimodal colloidal depletion gels.
 
 Simulations can be run using the [sim-scripts](./sim-scripts) and the DPDMorse extension for HOOMD-blue v4.2.1, available as [hoomd4.2.1-mod](https://github.com/procf/hoomd4.2.1-mod).
