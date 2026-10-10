@@ -16,7 +16,7 @@ source /projects/props/Rob/software/hoomd4.2.1-mod/hoomdmod4.2.1-venv/bin/activa
 module load OpenMPI/4.1.6
 
 # run the analysis file(s)
-python exec_cluster-bi.py gel_file bimodal_bool data_file cluster_style
+python exec_cluster.py gel_file bimodal_bool data_file cluster_style
 
 
 time=$((SECONDS-start))

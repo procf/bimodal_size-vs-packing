@@ -1,7 +1,8 @@
-## Extract data to CSV and run primary network analysis on the results 
-## of a BD colloid simulation
-## NOTE: this code assumes 1 colloid type (typeid=0)
-##
+## Apply GMM-based clustering to the particle 
+## trajectories from a colloidal gel simulation
+## NOTE: before running this script make sure the
+##       network has been created with 
+##       sim-build-particle-network.py
 """
 ## Cluster the network using GMM
 ##

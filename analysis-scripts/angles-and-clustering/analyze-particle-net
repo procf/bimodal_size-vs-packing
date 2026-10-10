@@ -14,7 +14,7 @@ module load miniconda3/24.11.1
 source /projects/props/Rob/software/hoomd4.2.1-mod/hoomdmod4.2.1-venv/bin/activate
 module load OpenMPI/4.1.6
 
-python sim-build-particle-network-bi.py gel_file bimodal_bool data_file
+python sim-build-particle-network.py gel_file bimodal_bool data_file
 
 
 time=$((SECONDS-start))

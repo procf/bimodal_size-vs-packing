@@ -48,7 +48,7 @@ for ((c=0; c<${#percent_large[@]}; c++)); do
     #echo $data_path
     mkdir -p "$data_path"
 
-    cp analyze-particle-net-bi $analysis_path/job-net
+    cp analyze-particle-net $analysis_path/job-net
 
     sed -i "s|gel_file|${gel_path}|g" $analysis_path/job-net
     sed -i "s/bimodal_bool/${bimodal_bool}/g" $analysis_path/job-net

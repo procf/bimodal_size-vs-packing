@@ -1,7 +1,5 @@
-## Extract data to CSV and run primary network analysis on the results 
-## of a BD colloid simulation
-## NOTE: requires matching Fortran module
-## NOTE: this code assumes 1 colloid type (typeid=0)
+## Extract data to CSV and run primary network analysis on 
+## the particle trajectories from a colloid simulation
 ##
 """
 ## Load data and build a network
@@ -9,7 +7,7 @@
 ## How to use:
 ##     python sim-build-particle-network.py 
 ##
-## - Load data from gel_file (GSD or CSV) and build a network, G
+## - Load data from a GSD gel_file and build a network, G
 ## - Collect angle distribution for G
 ##
 ## OUTPUT:
@@ -43,7 +41,6 @@
 # load data and build a network
 import numpy as np
 import gsd.hoomd
-import fortranmod as module 
 import pandas as pd
 import networkx as nx
 import os
@@ -194,54 +191,83 @@ def posCSV_calc(filename):
   print(" - Position data saved to CSV for "+str(nframes)+" frames")
 
 ## edgelistCSV
-"""
-# create a CSV file of all the bonded particle pairs (i.e. edges of the network) for each frame
-# i,j position for each bond/edge
-"""
+  """
+  # create a CSV file of all the bonded particle pairs (i.e. edges of the network) for each frame
+  # i,j position for each bond/edge
+  """
 
-def edgelistCSV_calc(filename):
-  # open the simulation GSD file as "traj" (trajectory)
-  traj = gsd.hoomd.open(filename, 'r')
-  
-  # set path and filename
-  edge_dir_path = posedge_outpath+'/frame-edges'
-  edge_output = edge_dir_path+'/edgelist' # + <#>.csv in python loop
-  
-  # check for existing CSV data 
-  if os.path.exists(edge_dir_path) == False:
-    os.mkdir(edge_dir_path)
-  if os.path.exists(edge_dir_path) == True:
-    # NOTE: this counts ALL CSV files in this directory
-    nframes = 0
-    # set the pattern for files ending in <number>.csv
-    pattern = re.compile(r'edgelist\d+\.csv$')
-    # Iterate directory
-    for filename in os.listdir(edge_dir_path):
-      # Check if the file has a CSV extension
-      if pattern.match(filename):
-        nframes += 1
-    
-    if nframes == len(traj):
-      print(' - edgelist data CSV files already seem to exist for all frames. Not creating new CSV files.')
-      return
+  def edgelistCSV_calc(filename):
+    # open the simulation GSD file as "traj" (trajectory)
+    traj = gsd.hoomd.open(filename, 'r')
 
-  nframes = len(traj)
-  if bimodal_bool == True:
-    colloids = np.where((traj[-1].particles.typeid == colloid1_typeid) | (traj[-1].particles.typeid == colloid2_typeid))[0]
-  else:
-    colloids = np.where(traj[-1].particles.typeid == [colloid_typeid])[0]
-  ncolloids = len(colloids)
-  radii = 0.5*traj[-1].particles.diameter[colloids]
-  rcut = cut_off
-  lbox = traj[-1].configuration.box[:3]
+    # set path and filename
+    #edge_dir_path = data_outpath+'/frame-edges'
+    edge_dir_path = posedge_outpath+'/frame-edges'
+    edge_output = edge_dir_path+'/edgelist' # + <#>.csv in python loop
 
-  # create an array of xyz positon of all colloids in all frames    
-  allpos = np.zeros((nframes,ncolloids,3))
-  for i in range(0,nframes):
-    allpos[i,:,:] = traj[i].particles.position[colloids] 
- 
-  module.edgelist_calc(nframes,ncolloids,radii,allpos,lbox,rcut,edge_output)
-  print(" - Edgelist calculation complete for "+str(nframes)+" frames")
+    # check for existing CSV data 
+    if os.path.exists(edge_dir_path) == False:
+      os.mkdir(edge_dir_path)
+    if os.path.exists(edge_dir_path) == True:
+      # NOTE: this counts ALL edgelist CSV files in this directory
+      nframes = 0
+      # set the pattern for files ending in <number>.csv
+      pattern = re.compile(r'edgelist\d+\.csv$')
+      # Iterate directory
+      for file in os.listdir(edge_dir_path):
+        # Check if the file has a CSV extension
+        if pattern.match(file):
+          nframes += 1
+
+      if nframes == len(traj):
+        print(' - edgelist data CSV files already seem to exist for all frames. Not creating new CSV files.')
+        return
+
+    nframes = len(traj)
+    if bimodal_bool == True:
+      colloids = np.where((traj[-1].particles.typeid == colloid1_typeid) | (traj[-1].particles.typeid == colloid2_typeid))[0]
+    else:
+      colloids = np.where(traj[-1].particles.typeid == [colloid_typeid])[0]
+    ncolloids = len(colloids)
+    radii = 0.5*traj[-1].particles.diameter[colloids]
+    rcut = cut_off
+    lbox = traj[-1].configuration.box[:3]
+
+    # create an array of xyz positon of all colloids in all frames    
+    allpos = np.zeros((nframes,ncolloids,3))
+    for i in range(0,nframes):
+      allpos[i,:,:] = traj[i].particles.position[colloids]
+
+    for f in range(nframes):
+      edge_file = f"{edge_output}{f}.csv"
+      pos = allpos[f,:,:]
+
+      # cKDTree's periodic mode needs coordinates in [0, L)
+      wrapped = np.mod(pos + 0.5 * lbox, lbox)
+      wrapped[wrapped >= lbox] = 0.0  # guard against float round-off landing on L
+      tree = cKDTree(wrapped, boxsize=lbox)
+
+      # candidate pairs: the largest possible center-center bond distance
+      max_dist = rcut + 2.0 * radii.max()
+      pairs = tree.query_pairs(r=max_dist, output_type='ndarray')  # rows are (i, j) with i < j
+
+      if len(pairs) > 0:
+        i, j = pairs[:, 0], pairs[:, 1]
+        # center-center separation with minimum-image convention
+        rij = pos[i] - pos[j]
+        rij -= lbox * np.round(rij / lbox)
+        # surface-surface distance
+        hij = np.linalg.norm(rij, axis=1) - (radii[i] + radii[j])
+        pairs = pairs[hij <= rcut]
+        # sort to order by i, then j
+        pairs = pairs[np.lexsort((pairs[:, 1], pairs[:, 0]))]
+
+      # save the edgelist (header-only file if there are no bonds)
+      np.savetxt(edge_file, pairs.reshape(-1, 2), fmt='%d', delimiter=',',
+        header='i,j', comments='')
+
+    print(f"Edgelist calculation complete for {nframes} frames")
+
 
 # create the edgelist
 posCSV_calc(gel_file)	
